@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.util.NestedServletException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -132,13 +133,14 @@ public class CalculatorControllerTest {
         // when
         Mockito.when(calculatorServiceMock.divide(a, b)).thenThrow(CalculatorException.class);
 
-        mockMvc.perform(post("/divide")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(input)))
-                .andExpect(result ->
-                    assertTrue(result.getResolvedException() instanceof CalculatorException)
-                );
+        try {
+            mockMvc.perform(post("/divide")
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .accept(MediaType.APPLICATION_JSON_VALUE)
+                    .content(objectMapper.writeValueAsString(input)));
+        } catch (NestedServletException ex) {
+            assertTrue(ex.getCause() instanceof CalculatorException);
+        }
     }
 
     @Test
