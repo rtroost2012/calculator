@@ -2,17 +2,16 @@ package nl.aegon.calculator.service;
 
 import nl.aegon.calculator.exception.CalculatorException;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class CalculatorServiceTest {
 
-    @Autowired
-    private CalculatorService calculatorService;
+    private final CalculatorService calculatorService = new CalculatorService();
 
     @Test
     public void testCanAddNumbers() {
