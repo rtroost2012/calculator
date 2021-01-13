@@ -3,7 +3,10 @@ package nl.aegon.calculator.web.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.aegon.calculator.enums.CalculationType;
 import nl.aegon.calculator.exception.CalculatorException;
+import nl.aegon.calculator.model.Calculation;
+import nl.aegon.calculator.service.CalculatorPersistenceService;
 import nl.aegon.calculator.service.CalculatorService;
+import nl.aegon.calculator.transformer.CalculationTransformer;
 import nl.aegon.calculator.web.dto.CalculationDto;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -28,6 +31,9 @@ public class CalculatorControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private CalculatorPersistenceService calculatorPersistenceServiceMock;
 
     @MockBean
     private CalculatorService calculatorServiceMock;
@@ -59,7 +65,13 @@ public class CalculatorControllerTest {
                     assertEquals(a, output.getA());
                     assertEquals(b, output.getB());
                 });
-        
+
+        // then
+        final Calculation result = CalculationTransformer.toModel(input);
+        result.setType(CalculationType.ADDITION);
+        result.setResult(20);
+
+        Mockito.verify(calculatorPersistenceServiceMock, times(1)).save(result);
         Mockito.verify(calculatorServiceMock, times(1)).add(a, b);
     }
 
@@ -89,6 +101,12 @@ public class CalculatorControllerTest {
                     assertEquals(b, output.getB());
                 });
 
+        // then
+        final Calculation result = CalculationTransformer.toModel(input);
+        result.setType(CalculationType.SUBTRACTION);
+        result.setResult(0.0);
+
+        Mockito.verify(calculatorPersistenceServiceMock, times(1)).save(result);
         Mockito.verify(calculatorServiceMock, times(1)).subtract(a, b);
     }
 
@@ -118,6 +136,12 @@ public class CalculatorControllerTest {
                     assertEquals(b, output.getB());
                 });
 
+        // then
+        final Calculation result = CalculationTransformer.toModel(input);
+        result.setType(CalculationType.DIVISION);
+        result.setResult(2.0);
+
+        Mockito.verify(calculatorPersistenceServiceMock, times(1)).save(result);
         Mockito.verify(calculatorServiceMock, times(1)).divide(a, b);
     }
 
@@ -169,6 +193,12 @@ public class CalculatorControllerTest {
                     assertEquals(b, output.getB());
                 });
 
+        // then
+        final Calculation result = CalculationTransformer.toModel(input);
+        result.setType(CalculationType.MULTIPLICATION);
+        result.setResult(100.0);
+
+        Mockito.verify(calculatorPersistenceServiceMock, times(1)).save(result);
         Mockito.verify(calculatorServiceMock, times(1)).multiply(a, b);
     }
 }

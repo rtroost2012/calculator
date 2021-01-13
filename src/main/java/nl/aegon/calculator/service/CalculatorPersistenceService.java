@@ -2,10 +2,12 @@ package nl.aegon.calculator.service;
 
 import nl.aegon.calculator.model.Calculation;
 import nl.aegon.calculator.repository.CalculatorRepository;
+import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
 
+@Service
 public class CalculatorPersistenceService {
     private final CalculatorRepository calculatorRepository;
 

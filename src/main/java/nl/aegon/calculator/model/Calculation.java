@@ -5,8 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import nl.aegon.calculator.enums.CalculationType;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Data
@@ -14,8 +13,10 @@ import javax.persistence.Id;
 @NoArgsConstructor
 public class Calculation {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Enumerated
     private CalculationType type;
 
     private int a;
