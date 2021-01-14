@@ -83,6 +83,5 @@ public class CalculatorServiceTest {
 
         // when, then
         assertThrows(CalculatorException.class, () -> calculatorService.divide(a, b));
-        assertThrows(CalculatorException.class, () -> calculatorService.divide(b, a));
     }
 }
