@@ -1,5 +1,6 @@
 package nl.aegon.calculator.web.rest;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.aegon.calculator.enums.CalculationType;
 import nl.aegon.calculator.exception.CalculatorException;
@@ -16,13 +17,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.util.NestedServletException;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @SpringBootTest
@@ -41,6 +45,33 @@ public class CalculatorControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
+    public void testCanFetchCalculations() throws Exception {
+        // given
+        final List<Calculation> calculations = List.of(
+            new Calculation(1L, CalculationType.ADDITION, 10, 20, 30.0),
+            new Calculation(2L, CalculationType.SUBTRACTION, 10, 20, -10.0)
+        );
+
+        // when
+        Mockito.when(calculatorPersistenceServiceMock.findAll()).thenReturn(calculations);
+
+        mockMvc.perform(get("/all")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(result -> { // then
+                    var response = result.getResponse();
+                    var expectedDtos = calculations
+                            .stream()
+                            .map(CalculationTransformer::toDto)
+                            .collect(Collectors.toList());
+                    var responseDtos = objectMapper
+                            .readValue(response.getContentAsString(), new TypeReference<List<CalculationDto>>(){});
+
+                    assertEquals(expectedDtos, responseDtos);
+                });
+    }
+
+    @Test
     public void testCanPerformAddition() throws Exception {
         // given
         final CalculationDto input = new CalculationDto();
@@ -57,7 +88,7 @@ public class CalculatorControllerTest {
                         .accept(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(input)))
                 .andExpect(result -> { // then
-                    final MockHttpServletResponse response = result.getResponse();
+                    final var response = result.getResponse();
                     final CalculationDto output = objectMapper.readValue(response.getContentAsString(), CalculationDto.class);
                     assertEquals(HttpStatus.OK.value(), response.getStatus());
                     assertEquals(CalculationType.ADDITION, output.getType());
@@ -92,7 +123,7 @@ public class CalculatorControllerTest {
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(input)))
                 .andExpect(result -> { // then
-                    final MockHttpServletResponse response = result.getResponse();
+                    final var response = result.getResponse();
                     final CalculationDto output = objectMapper.readValue(response.getContentAsString(), CalculationDto.class);
                     assertEquals(HttpStatus.OK.value(), response.getStatus());
                     assertEquals(CalculationType.SUBTRACTION, output.getType());
@@ -127,7 +158,7 @@ public class CalculatorControllerTest {
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(input)))
                 .andExpect(result -> { // then
-                    final MockHttpServletResponse response = result.getResponse();
+                    final var response = result.getResponse();
                     final CalculationDto output = objectMapper.readValue(response.getContentAsString(), CalculationDto.class);
                     assertEquals(HttpStatus.OK.value(), response.getStatus());
                     assertEquals(CalculationType.DIVISION, output.getType());
@@ -184,7 +215,7 @@ public class CalculatorControllerTest {
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(input)))
                 .andExpect(result -> { // then
-                    final MockHttpServletResponse response = result.getResponse();
+                    final var response = result.getResponse();
                     final CalculationDto output = objectMapper.readValue(response.getContentAsString(), CalculationDto.class);
                     assertEquals(HttpStatus.OK.value(), response.getStatus());
                     assertEquals(CalculationType.MULTIPLICATION, output.getType());

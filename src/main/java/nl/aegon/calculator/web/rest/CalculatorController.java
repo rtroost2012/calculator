@@ -8,10 +8,10 @@ import nl.aegon.calculator.service.CalculatorService;
 import nl.aegon.calculator.transformer.CalculationTransformer;
 import nl.aegon.calculator.web.dto.CalculationDto;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
@@ -27,6 +27,16 @@ public class CalculatorController {
     public CalculatorController(CalculatorService calcService, CalculatorPersistenceService calcPersistenceService) {
         calculatorService = calcService;
         calculatorPersistenceService = calcPersistenceService;
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<CalculationDto>> all() {
+        final List<Calculation> calculations = calculatorPersistenceService.findAll();
+        final List<CalculationDto> calculationDtos = calculations
+                .stream()
+                .map(CalculationTransformer::toDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(calculationDtos);
     }
 
     @PostMapping("/add")
