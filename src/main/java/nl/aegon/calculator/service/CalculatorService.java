@@ -44,7 +44,7 @@ public class CalculatorService {
      * @throws CalculatorException Division by zero Exception
      */
     public double divide(int a, int b) throws CalculatorException {
-        if (a == 0 || b == 0) {
+        if (b == 0) {
             throw new CalculatorException("Cannot divide a number by zero");
         }
         return (double)a/b;

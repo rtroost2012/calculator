@@ -66,10 +66,12 @@ public class CalculatorServiceTest {
 
         // when
         final double result = calculatorService.divide(a, b);
+        final double resultZeroDivision = calculatorService.divide(0, 20);
         final double resultOverflow = calculatorService.divide(a, Integer.MAX_VALUE);
 
         // then
         assertEquals(2,  result);
+        assertEquals(0, resultZeroDivision);
         assertEquals((double)a / Integer.MAX_VALUE, resultOverflow);
     }
 
